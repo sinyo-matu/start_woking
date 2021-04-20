@@ -1,29 +1,64 @@
-use lambda_runtime::{handler_fn, Context, Error};
+use chrono::prelude::*;
+use lambda_http::{
+    handler,
+    lambda_runtime::{self, Context},
+    IntoResponse, Request, RequestExt, Response,
+};
 use rusoto_ses::Ses;
-use serde_json::{json, Value};
 use std::env;
+
+type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let func = handler_fn(func);
+    let func = handler(func);
     lambda_runtime::run(func).await?;
     Ok(())
 }
 
-async fn func(event: Value, _: Context) -> Result<Value, Error> {
+async fn func(event: Request, _: Context) -> Result<impl IntoResponse, Error> {
     let (subject, to_addr) = match env::var("TEST").unwrap().as_str() {
         "TRUE" => ("test".to_string(), "seelerei0130@gmail.com".to_string()),
         "FALSE" => ("start_working".to_string(), env::var("TO_ADDR").unwrap()),
         _ => ("test".to_string(), "seelerei0130@gmail.com".to_string()),
     };
-
-    let content_title = event["queryStringParameters"]["content"]
-        .as_str()
-        .unwrap_or("test");
-    let mail_body = match content_title {
-        "start_content" => env::var("START_CONTENT1").unwrap(),
-        "over_content" => env::var("OVER_CONTENT").unwrap(),
-        _ => "test".to_string(),
+    let content_title = match event.query_string_parameters().get("content") {
+        Some(c) => c.to_string(),
+        None => "test".to_string(),
+    };
+    let mail_body = match content_title.as_str() {
+        "start_content" => {
+            let now = Local::now();
+            if now.hour() <= 14 {
+                env::var("START_CONTENT1").unwrap()
+            } else {
+                return Ok(Response::builder()
+                    .status(400)
+                    .body("content not match time".into())
+                    .expect("failed to render response"));
+            }
+        }
+        "over_content" => {
+            let now = Local::now();
+            if now.hour() > 14 {
+                env::var("OVER_CONTENT").unwrap()
+            } else {
+                return Ok(Response::builder()
+                    .status(400)
+                    .body("content not match time".into())
+                    .expect("failed to render response"));
+            }
+        }
+        _ => {
+            if env::var("TEST").unwrap().as_str() == "TRUE" {
+                "test".to_string()
+            } else {
+                return Ok(Response::builder()
+                    .status(400)
+                    .body("can not detect content parameter".into())
+                    .expect("failed to render response"));
+            }
+        }
     };
     let ses_client = rusoto_ses::SesClient::new(rusoto_signature::Region::UsEast1);
     let request = rusoto_ses::SendEmailRequest {
@@ -52,5 +87,5 @@ async fn func(event: Value, _: Context) -> Result<Value, Error> {
         Err(err) => return Err(Box::new(err)),
     };
 
-    Ok(json!({ "statusCode":200,"response": "Ok!" }))
+    Ok("Ok".to_string().into_response())
 }

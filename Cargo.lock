@@ -99,6 +99,7 @@ dependencies = [
  "num-integer",
  "num-traits",
  "serde",
+ "time 0.1.43",
  "winapi",
 ]
 
@@ -446,6 +447,20 @@ name = "itoa"
 version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd25036021b0de88a0aff6b850051563c6516d0bf53f8638938edbb9de732736"
+
+[[package]]
+name = "lambda_http"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "53d2f5bbdf23c5b73faa7fccf8014642f9817a674a09e714511930bd868cbc19"
+dependencies = [
+ "base64",
+ "http",
+ "lambda_runtime",
+ "serde",
+ "serde_json",
+ "serde_urlencoded 0.7.0",
+]
 
 [[package]]
 name = "lambda_runtime"
@@ -830,7 +845,7 @@ dependencies = [
  "bytes",
  "futures",
  "rusoto_core",
- "serde_urlencoded",
+ "serde_urlencoded 0.6.1",
  "xml-rs",
 ]
 
@@ -855,7 +870,7 @@ dependencies = [
  "rustc_version",
  "serde",
  "sha2",
- "time",
+ "time 0.2.26",
  "tokio",
 ]
 
@@ -966,6 +981,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_urlencoded"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "edfa57a7f8d9c1d260a549e7224100f6c43d43f9103e06dd8b4095a9b2b43ce9"
+dependencies = [
+ "form_urlencoded",
+ "itoa",
+ "ryu",
+ "serde",
+]
+
+[[package]]
 name = "sha1"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1037,10 +1064,10 @@ dependencies = [
 name = "start_working"
 version = "0.1.0"
 dependencies = [
- "lambda_runtime",
+ "chrono",
+ "lambda_http",
  "rusoto_ses",
  "rusoto_signature",
- "serde_json",
  "tokio",
 ]
 
@@ -1131,6 +1158,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8018d24e04c95ac8790716a5987d0fec4f8b27249ffa0f7d33f1369bdfb88cbd"
 dependencies = [
  "once_cell",
+]
+
+[[package]]
+name = "time"
+version = "0.1.43"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ca8a50ef2360fbd1eeb0ecd46795a87a19024eb4b53c5dc916ca1fd95fe62438"
+dependencies = [
+ "libc",
+ "winapi",
 ]
 
 [[package]]
