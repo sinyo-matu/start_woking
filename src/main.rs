@@ -11,9 +11,10 @@ async fn main() -> Result<(), Error> {
 }
 
 async fn func(event: Value, _: Context) -> Result<Value, Error> {
-    let (subject, to_addr) = match env::var("TEST").unwrap() == "TRUE" {
-        true => ("test".to_string(), "seelerei0130@gmail.com".to_string()),
-        false => ("start_working".to_string(), env::var("TO_ADDR").unwrap()),
+    let (subject, to_addr) = match env::var("TEST").unwrap().as_str() {
+        "TRUE" => ("test".to_string(), "seelerei0130@gmail.com".to_string()),
+        "FALSE" => ("start_working".to_string(), env::var("TO_ADDR").unwrap()),
+        _ => ("test".to_string(), "seelerei0130@gmail.com".to_string()),
     };
 
     let content_title = event["queryStringParameters"]["content"]
@@ -51,5 +52,5 @@ async fn func(event: Value, _: Context) -> Result<Value, Error> {
         Err(err) => return Err(Box::new(err)),
     };
 
-    Ok(json!({ "response": "Ok!" }))
+    Ok(json!({ "statusCode":200,"response": "Ok!" }))
 }
