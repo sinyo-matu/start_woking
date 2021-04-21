@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build and Zip
-        uses: sinyo-matu/cargo-static-build@master
+        uses: zhxiaogg/cargo-static-build@master
         with:
           cmd: cargo build --release
       - run: |
