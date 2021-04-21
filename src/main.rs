@@ -17,10 +17,22 @@ async fn main() -> Result<(), Error> {
 }
 
 async fn func(event: Request, _: Context) -> Result<impl IntoResponse, Error> {
-    let (subject, to_addr) = match env::var("TEST").unwrap().as_str() {
-        "TRUE" => ("test".to_string(), "seelerei0130@gmail.com".to_string()),
-        "FALSE" => ("start_working".to_string(), env::var("TO_ADDR").unwrap()),
-        _ => ("test".to_string(), "seelerei0130@gmail.com".to_string()),
+    let (subject, to_addr, is_test) = match env::var("TEST").unwrap().as_str() {
+        "TRUE" => (
+            "test".to_string(),
+            "seelerei0130@gmail.com".to_string(),
+            true,
+        ),
+        "FALSE" => (
+            "start_working".to_string(),
+            env::var("TO_ADDR").unwrap(),
+            false,
+        ),
+        _ => (
+            "test".to_string(),
+            "seelerei0130@gmail.com".to_string(),
+            true,
+        ),
     };
     let content_title = match event.query_string_parameters().get("content") {
         Some(c) => c.to_string(),
@@ -50,7 +62,7 @@ async fn func(event: Request, _: Context) -> Result<impl IntoResponse, Error> {
             }
         }
         _ => {
-            if env::var("TEST").unwrap().as_str() == "TRUE" {
+            if is_test {
                 "test".to_string()
             } else {
                 return Ok(Response::builder()
