@@ -18,8 +18,8 @@ jobs:
         with:
           cmd: cargo build --release
       - run: |
-          mv ./target/x86_64-unknown-linux-musl/release/start_working ./bootstrap
-          chmod 755 ./bootstrap
+          sudo mv ./target/x86_64-unknown-linux-musl/release/start_working ./bootstrap
+          sudo chmod 755 ./bootstrap
           zip lambda.zip ./bootstrap
       - name: Push to aws/lambda
         uses: stcalica/update-lambda@master
