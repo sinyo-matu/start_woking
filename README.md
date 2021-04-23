@@ -1,9 +1,5 @@
-<h3 style="text-align: center;">
-A sample for Aws Lambda function written by rust
-</h3>
+### A sample of Aws Lambda function written by Rust using [aws-lambda-rust-runtime](https://github.com/awslabs/aws-lambda-rust-runtime)
 
-<h5 style="text-align: center;">
-With Github Action Workflow to build and push binary to Aws Lambda
-</h5>
+##### With Github Action Workflow to build and push binary to Aws Lambda
 
 This function will receive a request then send a email
