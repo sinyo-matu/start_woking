@@ -18,9 +18,8 @@ async fn main() -> Result<(), Error> {
 
 async fn func(event: Request, _: Context) -> Result<impl IntoResponse, Error> {
     let (subject, to_addr) = match env::var("TEST").unwrap().as_str() {
-        "TRUE" => ("test".to_string(), "seelerei0130@gmail.com".to_string()),
         "FALSE" => ("start_working".to_string(), env::var("TO_ADDR").unwrap()),
-        _ => ("test".to_string(), "seelerei0130@gmail.com".to_string()),
+        _ => ("test".to_string(), env::var("TEST_ADDR").unwrap()),
     };
     let content_title = match event.query_string_parameters().get("content") {
         Some(c) => c.to_string(),
@@ -79,12 +78,14 @@ async fn func(event: Request, _: Context) -> Result<impl IntoResponse, Error> {
                 ..Default::default()
             },
         },
-        source: "amon.yamamoto@gmail.com".to_string(),
+        source: env::var("FROM_ADDR").unwrap(),
         ..Default::default()
     };
-    match ses_client.send_email(request).await {
-        Ok(send_mail_response) => send_mail_response,
-        Err(err) => return Err(Box::new(err)),
+    if let Err(err) = ses_client.send_email(request).await {
+        return Ok(Response::builder()
+            .status(400)
+            .body(format!("error:{}", err).into())
+            .expect("failed to render response"));
     };
 
     Ok("Ok".to_string().into_response())
