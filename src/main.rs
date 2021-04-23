@@ -17,13 +17,22 @@ async fn main() -> Result<(), Error> {
 }
 
 async fn func(event: Request, _: Context) -> Result<impl IntoResponse, Error> {
-    let (subject, to_addr) = match env::var("TEST").unwrap().as_str() {
-        "FALSE" => ("start_working".to_string(), env::var("TO_ADDR").unwrap()),
-        _ => ("test".to_string(), env::var("TEST_ADDR").unwrap()),
+    let (subject, to_addr, is_test) = match env::var("TEST").unwrap().as_str() {
+        "FALSE" => (
+            "start_working".to_string(),
+            env::var("TO_ADDR").unwrap(),
+            false,
+        ),
+        _ => ("test".to_string(), env::var("TEST_ADDR").unwrap(), true),
     };
     let content_title = match event.query_string_parameters().get("content") {
         Some(c) => c.to_string(),
-        None => "test".to_string(),
+        None => {
+            return Ok(Response::builder()
+                .status(400)
+                .body("can not detect content parameter".into())
+                .expect("failed to render response"))
+        }
     };
     let mail_body = match content_title.as_str() {
         "start_content" => {
@@ -49,12 +58,12 @@ async fn func(event: Request, _: Context) -> Result<impl IntoResponse, Error> {
             }
         }
         _ => {
-            if env::var("TEST").unwrap().as_str() == "TRUE" {
+            if is_test {
                 "test".to_string()
             } else {
                 return Ok(Response::builder()
                     .status(400)
-                    .body("can not detect content parameter".into())
+                    .body("content parameter not matched".into())
                     .expect("failed to render response"));
             }
         }
