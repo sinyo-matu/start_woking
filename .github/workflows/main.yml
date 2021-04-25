@@ -11,14 +11,12 @@ on:
       - "README.md"
       - "LICENSE"
 
-  ENV:
-    BINARY_NAME: start_working
-    FUNCTION_NAME: work_statement
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    env:
+      BINARY_NAME: start_working
+      FUNCTION_NAME: work_statement
     steps:
       - uses: actions/checkout@v2
       - name: Build and Zip
