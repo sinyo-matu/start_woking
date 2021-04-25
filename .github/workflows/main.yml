@@ -11,7 +11,9 @@ on:
       - "README.md"
       - "LICENSE"
 
-  workflow_dispatch:
+  ENV:
+    BINARY_NAME: start_working
+    FUNCTION_NAME: work_statement
 
 jobs:
   build:
@@ -24,14 +26,14 @@ jobs:
         with:
           cmd: cargo build --release
       - run: |
-          sudo mv ./target/x86_64-unknown-linux-musl/release/start_working ./bootstrap
+          sudo mv ./target/x86_64-unknown-linux-musl/release/${{ env.BINARY_NAME }} ./bootstrap
           sudo chmod 755 ./bootstrap
           zip lambda.zip ./bootstrap
       - name: Push to aws/lambda
         uses: stcalica/update-lambda@master
         with:
           package: lambda.zip
-          function-name: work_statement
+          function-name: ${{ env.FUNCTION_NAME }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_SECRET_ID: ${{ secrets.AWS_SECRET_ID }}
           AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
